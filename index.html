@@ -1,0 +1,1637 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מערכת ניהול משמרות - גרסה מלאה</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 32px;
+        }
+        
+        h2 {
+            color: #34495e;
+            margin: 20px 0 15px 0;
+            font-size: 22px;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 10px;
+        }
+        
+        h3 {
+            color: #7f8c8d;
+            margin: 15px 0 10px 0;
+            font-size: 18px;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        .tab {
+            padding: 12px 24px;
+            background: #f8f9fa;
+            border: none;
+            cursor: pointer;
+            border-radius: 8px 8px 0 0;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        .tab:hover {
+            background: #e9ecef;
+        }
+        
+        .tab.active {
+            background: #3498db;
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .controls {
+            background-color: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .control-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        label {
+            font-weight: bold;
+            color: #555;
+            min-width: 120px;
+        }
+        
+        input, select {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        
+        input[type="number"] {
+            width: 80px;
+        }
+        
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .btn-primary {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .btn-success {
+            background-color: #27ae60;
+            color: white;
+        }
+        
+        .btn-warning {
+            background-color: #f39c12;
+            color: white;
+        }
+        
+        .btn-danger {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        .btn-info {
+            background-color: #16a085;
+            color: white;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .stat-box.success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+        
+        .stat-box.warning {
+            background: linear-gradient(135deg, #F2994A 0%, #F2C94C 100%);
+        }
+        
+        .stat-box.danger {
+            background: linear-gradient(135deg, #EB5757 0%, #FF6B6B 100%);
+        }
+        
+        .stat-box.info {
+            background: linear-gradient(135deg, #4ECDC4 0%, #44A08D 100%);
+        }
+        
+        .stat-box h4 {
+            margin: 0 0 10px 0;
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .stat-box .value {
+            font-size: 36px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .holiday-info {
+            background-color: #fff8dc;
+            border: 2px solid #ffd700;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .holiday-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .holiday-list li {
+            background: #fff;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .search-box {
+            background-color: #e8f4fd;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            margin-top: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+        
+        th, td {
+            border: 1px solid #e0e0e0;
+            padding: 10px;
+            text-align: center;
+            font-size: 14px;
+        }
+        
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .employee-name {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            text-align: right;
+            position: sticky;
+            right: 0;
+            z-index: 5;
+            min-width: 150px;
+        }
+        
+        .date-header {
+            writing-mode: vertical-lr;
+            text-orientation: mixed;
+            min-height: 80px;
+            font-size: 12px;
+        }
+        
+        .shift-cell {
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s;
+            position: relative;
+        }
+        
+        .shift-cell:hover {
+            background-color: #e3f2fd;
+            transform: scale(1.05);
+        }
+        
+        .shift-cell.checked {
+            background-color: #27ae60;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .shift-cell.manual {
+            background-color: #2c3e50;
+        }
+        
+        .shift-cell.holiday {
+            background-color: #ffd700;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        
+        .shift-cell.checked:after {
+            content: '✓';
+            font-size: 20px;
+        }
+        
+        .total-cell {
+            background-color: #ecf0f1;
+            font-weight: bold;
+        }
+        
+        .total-cell.error {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        .total-cell.warning {
+            background-color: #f39c12;
+            color: white;
+        }
+        
+        .daily-total {
+            background-color: #95a5a6;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .daily-total.error {
+            background-color: #e74c3c;
+        }
+        
+        .daily-total.warning {
+            background-color: #f39c12;
+        }
+        
+        .daily-total.holiday {
+            background-color: #ffd700;
+            color: #333;
+        }
+        
+        .highlight {
+            outline: 3px solid #e74c3c;
+            outline-offset: -1px;
+            background-color: #ffe5e5 !important;
+        }
+        
+        .employee-view {
+            margin-top: 20px;
+        }
+        
+        .employee-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .employee-card.violation {
+            border-left-color: #e74c3c;
+            background: #ffe5e5;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            animation: fadeIn 0.3s;
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            animation: slideIn 0.3s;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .close {
+            color: #aaa;
+            float: left;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close:hover {
+            color: #e74c3c;
+        }
+        
+        .alert {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+        
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .alert-warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        @media print {
+            .controls, .search-box, .action-buttons, .tabs, .holiday-info {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🗓️ מערכת ניהול משמרות - 17 עובדים</h1>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('calendar')">📅 לוח שנה</button>
+            <button class="tab" onclick="showTab('employees')">👥 תצוגת עובדים</button>
+            <button class="tab" onclick="showTab('settings')">⚙️ הגדרות</button>
+            <button class="tab" onclick="showTab('help')">❓ עזרה</button>
+        </div>
+        
+        <div id="calendar" class="tab-content active">
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <h4>סה"כ ימים</h4>
+                    <div class="value" id="totalDays">0</div>
+                </div>
+                <div class="stat-box success">
+                    <h4>ימי עבודה</h4>
+                    <div class="value" id="workDays">0</div>
+                </div>
+                <div class="stat-box info">
+                    <h4>ימי חופש</h4>
+                    <div class="value" id="holidayDays">0</div>
+                </div>
+                <div class="stat-box">
+                    <h4>ממוצע ימי עבודה לעובד</h4>
+                    <div class="value" id="avgWorkDays">0</div>
+                </div>
+                <div class="stat-box danger">
+                    <h4>ימים לא תקינים</h4>
+                    <div class="value" id="irregularDays">0</div>
+                </div>
+                <div class="stat-box warning">
+                    <h4>ימים עם 7 עובדים</h4>
+                    <div class="value" id="sevenWorkerDays">0</div>
+                </div>
+                <div class="stat-box danger">
+                    <h4>הפרות היעדרות</h4>
+                    <div class="value" id="violations">0</div>
+                </div>
+            </div>
+            
+            <div class="search-box">
+                <h3>🔍 חיפוש מהיר</h3>
+                <div class="control-group">
+                    <input type="text" id="searchName" placeholder="חפש לפי שם עובד..." onkeyup="searchByName()">
+                    <input type="date" id="searchDate" onchange="searchByDate()">
+                    <button class="btn-warning" onclick="clearSearch()">✖️ נקה חיפוש</button>
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn-success" onclick="smartFill()">🎯 השלם חכם</button>
+                <button class="btn-warning" onclick="randomFill()">🎲 שיבוץ רנדומלי מלא</button>
+                <button class="btn-info" onclick="validateSchedule()">✔️ בדוק תקינות</button>
+                <button class="btn-danger" onclick="clearAll()">🗑️ נקה הכל</button>
+                <button class="btn-primary" onclick="exportCSV()">📊 ייצוא CSV</button>
+                <button class="btn-primary" onclick="window.print()">🖨️ הדפסה</button>
+            </div>
+            
+            <div class="table-container">
+                <table id="mainTable">
+                    <thead id="tableHead"></thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div id="employees" class="tab-content">
+            <h2>תצוגת עובדים</h2>
+            <div class="search-box">
+                <h3>🔍 חיפוש עובד</h3>
+                <div class="control-group">
+                    <select id="employeeSelect" onchange="showEmployeeDetails()">
+                        <option value="">בחר עובד...</option>
+                    </select>
+                </div>
+            </div>
+            <div id="employeeDetails" class="employee-view"></div>
+        </div>
+        
+        <div id="settings" class="tab-content">
+            <h2>הגדרות מערכת</h2>
+            
+            <div class="controls">
+                <h3>📅 תאריכים</h3>
+                <div class="control-group">
+                    <label>תאריך התחלה:</label>
+                    <input type="date" id="startDate" value="2024-07-28">
+                    <label>תאריך סיום:</label>
+                    <input type="date" id="endDate" value="2024-10-08">
+                    <button class="btn-primary" onclick="updateDates()">🔄 עדכן תאריכים</button>
+                </div>
+            </div>
+            
+            <div class="controls">
+                <h3>⚙️ פרמטרים</h3>
+                <div class="control-group">
+                    <label>עובדים ביום:</label>
+                    <input type="number" id="targetWorkers" value="6" min="1" disabled>
+                    <span style="color: #666; font-size: 14px;">(קבוע: 6 עובדים בדיוק)</span>
+                </div>
+                <div class="control-group">
+                    <label>מקסימום ימי היעדרות רצופים:</label>
+                    <input type="number" id="maxAbsence" value="6" min="1" onchange="updateParameters()">
+                    <label>מקסימום ימים עם 7 עובדים:</label>
+                    <input type="number" id="maxExceptionDays" value="10" min="0" max="20" onchange="updateParameters()">
+                </div>
+            </div>
+            
+            <div class="controls">
+                <h3>👥 ניהול עובדים</h3>
+                <div class="control-group">
+                    <label>הוסף עובד:</label>
+                    <input type="text" id="newEmployee" placeholder="שם העובד">
+                    <button class="btn-success" onclick="addEmployee()">➕ הוסף</button>
+                </div>
+                <div class="control-group">
+                    <label>הסר עובד:</label>
+                    <select id="removeEmployeeSelect">
+                        <option value="">בחר עובד להסרה...</option>
+                    </select>
+                    <button class="btn-danger" onclick="removeEmployee()">➖ הסר</button>
+                </div>
+                <div class="control-group">
+                    <label>ערוך שם עובד:</label>
+                    <select id="editEmployeeSelect" onchange="loadEmployeeName()">
+                        <option value="">בחר עובד לעריכה...</option>
+                    </select>
+                    <input type="text" id="editEmployeeName" placeholder="שם חדש">
+                    <button class="btn-primary" onclick="editEmployee()">✏️ עדכן</button>
+                </div>
+            </div>
+            
+            <div class="controls">
+                <h3>🏖️ ניהול תקופות חופש</h3>
+                <div class="holiday-info">
+                    <h4>תקופות חופש פעילות:</h4>
+                    <ul id="holidaysList" class="holiday-list">
+                        <li>4/8/2024 - 16/8/2024 <button class="btn-danger" onclick="removeHoliday(0)">❌</button></li>
+                        <li>1/9/2024 - 13/9/2024 <button class="btn-danger" onclick="removeHoliday(1)">❌</button></li>
+                    </ul>
+                </div>
+                <div class="control-group">
+                    <label>הוסף תקופת חופש:</label>
+                    <input type="date" id="holidayStart" placeholder="מתאריך">
+                    <input type="date" id="holidayEnd" placeholder="עד תאריך">
+                    <button class="btn-warning" onclick="addHolidayPeriod()">➕ הוסף חופש</button>
+                    <button class="btn-danger" onclick="clearHolidays()">🗑️ נקה כל החופשים</button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="help" class="tab-content">
+            <h2>מדריך שימוש</h2>
+            
+            <div class="alert alert-info">
+                <h3>🎯 חוקי המערכת:</h3>
+                <ul>
+                    <li><strong>עובדים ביום:</strong> בדיוק 6 עובדים (עד 10 ימים מותרים עם 7 עובדים)</li>
+                    <li><strong>מקסימום היעדרות רצופה:</strong> 6 ימים (לא כולל ימי חופש)</li>
+                    <li><strong>ימי חופש:</strong> אף עובד לא משובץ בימי חופש כלליים</li>
+                </ul>
+            </div>
+            
+            <div class="alert alert-success">
+                <h3>📝 הוראות שימוש:</h3>
+                <ul>
+                    <li><strong>שיבוץ ידני:</strong> לחץ על תא בטבלה כדי לשבץ/לבטל עובד</li>
+                    <li><strong>השלם חכם:</strong> משלים לבדיוק 6 עובדים תוך שמירה על שיבוצים קיימים</li>
+                    <li><strong>שיבוץ רנדומלי:</strong> מנקה הכל ויוצר שיבוץ חדש עם בדיוק 6 עובדים ביום</li>
+                    <li><strong>חיפוש:</strong> חפש לפי שם עובד או תאריך ספציפי</li>
+                    <li><strong>תצוגת עובדים:</strong> ראה פרטי נוכחות לכל עובד</li>
+                </ul>
+            </div>
+            
+            <div class="alert alert-warning">
+                <h3>💡 טיפים:</h3>
+                <ul>
+                    <li>תאים צהובים = ימי חופש (לא ניתן לשבץ)</li>
+                    <li>תאים ירוקים = עובד משובץ</li>
+                    <li>תאים אפורים כהים = שיבוץ ידני</li>
+                    <li>מספרים אדומים = לא בדיוק 6 עובדים (למעט 7 בחריגה מותרת)</li>
+                    <li>מספרים כתומים = 7 עובדים (חריגה מותרת עד 10 ימים)</li>
+                    <li>אם יש יותר מ-10 ימים עם 7 עובדים, המספר יודגש באדום</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div id="alertModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let employees = [
+            "דוד בר-און", "יצחק סיבוני", "מרו מנטאסנוט", "אביתר כהן",
+            "שי תמם", "רם שילון", "נדב תורג׳מן", "יגל טויטו",
+            "אהרון רטנר", "אהוד לובטון", "דגן", "שרון ברששת",
+            "אריאל ליבמן", "רואי אלבז", "שילה פארן", "מתן גרידיש", "יטיב דמרי"
+        ];
+        
+        let shifts = {};
+        let startDate = new Date('2024-07-28');
+        let endDate = new Date('2024-10-08');
+        let targetWorkers = 6; // בדיוק 6 עובדים ביום
+        let maxAbsence = 6;
+        let maxExceptionDays = 10; // מקסימום 10 ימים עם 7 עובדים
+        
+        let holidays = [
+            { start: new Date('2024-08-03'), end: new Date('2024-08-17') },
+            { start: new Date('2024-08-31'), end: new Date('2024-09-14') }
+        ];
+        
+        // Utility functions
+        function formatDate(date) {
+            return `${date.getDate()}/${date.getMonth() + 1}`;
+        }
+        
+        function isHoliday(date) {
+            return holidays.some(h => date > h.start && date < h.end);
+        }
+        
+        function getDateParts(dateStr) {
+            const [day, month] = dateStr.split('/').map(Number);
+            let year = startDate.getFullYear();
+            let testDate = new Date(year, month - 1, day);
+            if (testDate < startDate) {
+                year = endDate.getFullYear();
+            }
+            return { day, month, year };
+        }
+        
+        // Tab management
+        function showTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+        }
+        
+        // Initialize the system
+        function init() {
+            updateEmployeeSelects();
+            buildTable();
+            updateStats();
+            updateHolidaysList();
+        }
+        
+        // Build main table
+        function buildTable() {
+            shifts = {};
+            const thead = document.getElementById('tableHead');
+            const tbody = document.getElementById('tableBody');
+            thead.innerHTML = '';
+            tbody.innerHTML = '';
+            
+            // Header row
+            const headerRow = document.createElement('tr');
+            const cornerTh = document.createElement('th');
+            cornerTh.textContent = 'שם העובד';
+            headerRow.appendChild(cornerTh);
+            
+            // Add date columns
+            const dates = [];
+            let current = new Date(startDate);
+            while (current <= endDate) {
+                dates.push(new Date(current));
+                const th = document.createElement('th');
+                const dateDiv = document.createElement('div');
+                dateDiv.className = 'date-header';
+                dateDiv.textContent = formatDate(current);
+                if (isHoliday(current)) {
+                    th.style.background = 'linear-gradient(135deg, #ffd700 0%, #ffed4e 100%)';
+                }
+                th.appendChild(dateDiv);
+                headerRow.appendChild(th);
+                current.setDate(current.getDate() + 1);
+            }
+            
+            // Add total column
+            const totalTh = document.createElement('th');
+            totalTh.textContent = 'סה"כ';
+            headerRow.appendChild(totalTh);
+            thead.appendChild(headerRow);
+            
+            // Employee rows
+            employees.forEach((emp, empIdx) => {
+                const row = document.createElement('tr');
+                
+                // Name cell
+                const nameCell = document.createElement('td');
+                nameCell.className = 'employee-name';
+                nameCell.textContent = emp;
+                row.appendChild(nameCell);
+                
+                // Date cells
+                dates.forEach(date => {
+                    const dateKey = formatDate(date);
+                    if (!shifts[dateKey]) shifts[dateKey] = {};
+                    shifts[dateKey][empIdx] = false;
+                    
+                    const cell = document.createElement('td');
+                    cell.className = 'shift-cell';
+                    if (isHoliday(date)) {
+                        cell.classList.add('holiday');
+                    }
+                    cell.dataset.date = dateKey;
+                    cell.dataset.employee = empIdx;
+                    cell.onclick = toggleShift;
+                    row.appendChild(cell);
+                });
+                
+                // Total cell
+                const totalCell = document.createElement('td');
+                totalCell.className = 'total-cell';
+                totalCell.id = `emp-total-${empIdx}`;
+                totalCell.textContent = '0';
+                row.appendChild(totalCell);
+                
+                tbody.appendChild(row);
+            });
+            
+            // Daily totals row
+            const totalRow = document.createElement('tr');
+            const totalLabel = document.createElement('td');
+            totalLabel.className = 'employee-name';
+            totalLabel.textContent = 'סה"כ יומי';
+            totalLabel.style.background = 'linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%)';
+            totalLabel.style.color = 'white';
+            totalRow.appendChild(totalLabel);
+            
+            dates.forEach(date => {
+                const dateKey = formatDate(date);
+                const td = document.createElement('td');
+                td.className = 'daily-total';
+                td.id = `day-total-${dateKey}`;
+                if (isHoliday(date)) {
+                    td.classList.add('holiday');
+                    td.textContent = 'חופש';
+                } else {
+                    td.textContent = '0';
+                }
+                totalRow.appendChild(td);
+            });
+            
+            totalRow.appendChild(document.createElement('td'));
+            tbody.appendChild(totalRow);
+            
+            updateStats();
+        }
+        
+        // Toggle shift assignment
+        function toggleShift(e) {
+            const date = e.target.dataset.date;
+            const emp = e.target.dataset.employee;
+            
+            // Check if holiday
+            const dateParts = getDateParts(date);
+            const currentDate = new Date(dateParts.year, dateParts.month - 1, dateParts.day);
+            
+            if (isHoliday(currentDate)) {
+                showAlert('לא ניתן לשבץ עובדים בימי חופש!', 'warning');
+                return;
+            }
+            
+            // Check if we're trying to add
+            const currentCount = Object.values(shifts[date]).filter(Boolean).length;
+            
+            if (!shifts[date][emp] && currentCount >= targetWorkers) {
+                // Allow 7 workers with confirmation
+                if (currentCount === targetWorkers) {
+                    if (confirm(`כבר יש ${targetWorkers} עובדים ביום זה. לאשר ${targetWorkers + 1} עובדים (חריגה)?`)) {
+                        // Continue with assignment
+                    } else {
+                        return;
+                    }
+                } else {
+                    showAlert(`כבר יש ${currentCount} עובדים ביום זה!`, 'warning');
+                    return;
+                }
+            }
+            
+            shifts[date][emp] = !shifts[date][emp];
+            
+            if (shifts[date][emp]) {
+                e.target.classList.add('checked', 'manual');
+            } else {
+                e.target.classList.remove('checked', 'manual');
+            }
+            
+            updateStats();
+        }
+        
+        // Update statistics
+        function updateStats() {
+            let totalDays = 0;
+            let workDays = 0;
+            let holidayDays = 0;
+            let irregularDays = 0;
+            let sevenWorkerDays = 0;
+            let violations = 0;
+            
+            // Count days
+            let current = new Date(startDate);
+            while (current <= endDate) {
+                totalDays++;
+                if (isHoliday(current)) {
+                    holidayDays++;
+                } else {
+                    workDays++;
+                }
+                current.setDate(current.getDate() + 1);
+            }
+            
+            // Update daily totals
+            Object.keys(shifts).forEach(date => {
+                const count = Object.values(shifts[date]).filter(Boolean).length;
+                const cell = document.getElementById(`day-total-${date}`);
+                if (cell) {
+                    const dateParts = getDateParts(date);
+                    const currentDate = new Date(dateParts.year, dateParts.month - 1, dateParts.day);
+                    
+                    if (isHoliday(currentDate)) {
+                        cell.textContent = 'חופש';
+                        cell.classList.add('holiday');
+                        cell.classList.remove('error', 'warning');
+                    } else {
+                        cell.textContent = count;
+                        cell.classList.remove('error', 'warning', 'holiday');
+                        
+                        if (count === targetWorkers) {
+                            // Exactly 6 workers - perfect!
+                        } else if (count === targetWorkers + 1) {
+                            // 7 workers - acceptable exception
+                            cell.classList.add('warning');
+                            sevenWorkerDays++;
+                            irregularDays++;
+                        } else {
+                            // Any other number - error
+                            cell.classList.add('error');
+                            irregularDays++;
+                        }
+                    }
+                }
+            });
+            
+            // Update employee totals and check violations
+            employees.forEach((emp, idx) => {
+                let total = 0;
+                let maxConsecutive = 0;
+                let currentConsecutive = 0;
+                
+                const sortedDates = Object.keys(shifts).sort((a, b) => {
+                    const dateA = getDateParts(a);
+                    const dateB = getDateParts(b);
+                    return new Date(dateA.year, dateA.month - 1, dateA.day) - 
+                           new Date(dateB.year, dateB.month - 1, dateB.day);
+                });
+                
+                sortedDates.forEach(date => {
+                    const dateParts = getDateParts(date);
+                    const currentDate = new Date(dateParts.year, dateParts.month - 1, dateParts.day);
+                    
+                    if (isHoliday(currentDate)) {
+                        return; // Skip holidays
+                    }
+                    
+                    if (shifts[date][idx]) {
+                        total++;
+                        currentConsecutive = 0;
+                    } else {
+                        currentConsecutive++;
+                        maxConsecutive = Math.max(maxConsecutive, currentConsecutive);
+                    }
+                });
+                
+                const cell = document.getElementById(`emp-total-${idx}`);
+                if (cell) {
+                    cell.textContent = total;
+                    cell.classList.remove('error');
+                    if (maxConsecutive > maxAbsence) {
+                        cell.classList.add('error');
+                        violations++;
+                    }
+                }
+            });
+            
+            // Update display
+            document.getElementById('totalDays').textContent = totalDays;
+            document.getElementById('workDays').textContent = workDays;
+            document.getElementById('holidayDays').textContent = holidayDays;
+            document.getElementById('irregularDays').textContent = irregularDays;
+            document.getElementById('sevenWorkerDays').textContent = sevenWorkerDays;
+            document.getElementById('violations').textContent = violations;
+            
+            // Check if too many exception days
+            if (sevenWorkerDays > maxExceptionDays) {
+                document.getElementById('sevenWorkerDays').style.color = '#e74c3c';
+                document.getElementById('sevenWorkerDays').style.fontWeight = 'bold';
+            } else {
+                document.getElementById('sevenWorkerDays').style.color = '';
+                document.getElementById('sevenWorkerDays').style.fontWeight = '';
+            }
+        }
+        
+        // Smart fill function
+        function smartFill() {
+            const dates = Object.keys(shifts).sort((a, b) => {
+                const dateA = getDateParts(a);
+                const dateB = getDateParts(b);
+                return new Date(dateA.year, dateA.month - 1, dateA.day) - 
+                       new Date(dateB.year, dateB.month - 1, dateB.day);
+            });
+            
+            const absences = new Array(employees.length).fill(0);
+            let sevenDayCount = 0;
+            
+            dates.forEach(date => {
+                const dateParts = getDateParts(date);
+                const currentDate = new Date(dateParts.year, dateParts.month - 1, dateParts.day);
+                
+                if (isHoliday(currentDate)) {
+                    return; // Skip holidays
+                }
+                
+                const mustWork = [];
+                const canWork = [];
+                let currentWorkers = 0;
+                
+                employees.forEach((emp, idx) => {
+                    if (shifts[date][idx]) {
+                        currentWorkers++;
+                        absences[idx] = 0;
+                    } else if (absences[idx] >= maxAbsence) {
+                        mustWork.push(idx);
+                    } else {
+                        canWork.push(idx);
+                    }
+                });
+                
+                // First assign those who MUST work
+                mustWork.forEach(empIdx => {
+                    if (currentWorkers < targetWorkers + 1) { // Allow up to 7
+                        shifts[date][empIdx] = true;
+                        absences[empIdx] = 0;
+                        currentWorkers++;
+                        
+                        const cell = document.querySelector(`[data-date="${date}"][data-employee="${empIdx}"]`);
+                        if (cell) {
+                            cell.classList.add('checked');
+                            cell.classList.remove('manual');
+                        }
+                    }
+                });
+                
+                // Calculate how many more we need
+                const needed = targetWorkers - currentWorkers;
+                
+                if (needed > 0 && canWork.length > 0) {
+                    // Sort by absence count (prioritize those with more absences)
+                    canWork.sort((a, b) => absences[b] - absences[a]);
+                    
+                    // Assign exactly the needed number
+                    for (let i = 0; i < Math.min(needed, canWork.length); i++) {
+                        const empIdx = canWork[i];
+                        shifts[date][empIdx] = true;
+                        absences[empIdx] = 0;
+                        
+                        const cell = document.querySelector(`[data-date="${date}"][data-employee="${empIdx}"]`);
+                        if (cell) {
+                            cell.classList.add('checked');
+                            cell.classList.remove('manual');
+                        }
+                    }
+                } else if (needed < 0) {
+                    // Too many workers - try to remove some if they're not manual
+                    const autoAssigned = [];
+                    employees.forEach((emp, idx) => {
+                        if (shifts[date][idx] && !document.querySelector(`[data-date="${date}"][data-employee="${idx}"]`).classList.contains('manual')) {
+                            autoAssigned.push(idx);
+                        }
+                    });
+                    
+                    // Remove excess workers
+                    for (let i = 0; i < Math.min(-needed, autoAssigned.length); i++) {
+                        const empIdx = autoAssigned[i];
+                        shifts[date][empIdx] = false;
+                        
+                        const cell = document.querySelector(`[data-date="${date}"][data-employee="${empIdx}"]`);
+                        if (cell) {
+                            cell.classList.remove('checked');
+                        }
+                    }
+                }
+                
+                // Update absence counters
+                employees.forEach((emp, idx) => {
+                    if (!shifts[date][idx]) {
+                        absences[idx]++;
+                    }
+                });
+                
+                // Count days with 7 workers
+                const finalCount = Object.values(shifts[date]).filter(Boolean).length;
+                if (finalCount === 7) {
+                    sevenDayCount++;
+                }
+            });
+            
+            updateStats();
+            
+            if (sevenDayCount > maxExceptionDays) {
+                showAlert(`השלמה בוצעה אך יש ${sevenDayCount} ימים עם 7 עובדים (מותר עד ${maxExceptionDays})`, 'warning');
+            } else {
+                showAlert('השלמה חכמה בוצעה בהצלחה!', 'success');
+            }
+        }
+        
+        // Random fill function
+        function randomFill() {
+            if (!confirm('פעולה זו תמחק את כל השיבוצים הקיימים. להמשיך?')) return;
+            
+            clearAll(false);
+            
+            const dates = Object.keys(shifts).sort((a, b) => {
+                const dateA = getDateParts(a);
+                const dateB = getDateParts(b);
+                return new Date(dateA.year, dateA.month - 1, dateA.day) - 
+                       new Date(dateB.year, dateB.month - 1, dateB.day);
+            });
+            
+            const absences = new Array(employees.length).fill(0);
+            const workDays = new Array(employees.length).fill(0);
+            let sevenDayCount = 0;
+            
+            dates.forEach(date => {
+                const dateParts = getDateParts(date);
+                const currentDate = new Date(dateParts.year, dateParts.month - 1, dateParts.day);
+                
+                if (isHoliday(currentDate)) {
+                    return; // Skip holidays
+                }
+                
+                // Identify who MUST work (reached max absence)
+                const mustWork = [];
+                const canWork = [];
+                
+                employees.forEach((emp, idx) => {
+                    if (absences[idx] >= maxAbsence) {
+                        mustWork.push(idx);
+                    } else {
+                        canWork.push(idx);
+                    }
+                });
+                
+                // First assign all who MUST work
+                mustWork.forEach(idx => {
+                    shifts[date][idx] = true;
+                    absences[idx] = 0;
+                    workDays[idx]++;
+                });
+                
+                // Calculate how many more we need
+                const assigned = mustWork.length;
+                let target = targetWorkers;
+                
+                // If we have too many must-work employees, allow 7
+                if (assigned > targetWorkers && assigned <= targetWorkers + 1 && sevenDayCount < maxExceptionDays) {
+                    target = assigned;
+                    sevenDayCount++;
+                }
+                
+                const remaining = Math.max(0, target - assigned);
+                
+                // Sort candidates by work balance and absence
+                canWork.sort((a, b) => {
+                    const daysDiff = workDays[a] - workDays[b];
+                    if (daysDiff !== 0) return daysDiff;
+                    return absences[b] - absences[a];
+                });
+                
+                // Add some randomness
+                for (let i = 0; i < canWork.length; i += 3) {
+                    const end = Math.min(i + 3, canWork.length);
+                    const slice = canWork.slice(i, end);
+                    slice.sort(() => Math.random() - 0.5);
+                    canWork.splice(i, 3, ...slice);
+                }
+                
+                // Assign exactly the needed workers
+                for (let i = 0; i < Math.min(remaining, canWork.length); i++) {
+                    const idx = canWork[i];
+                    shifts[date][idx] = true;
+                    absences[idx] = 0;
+                    workDays[idx]++;
+                }
+                
+                // Update absence counters and UI
+                employees.forEach((emp, idx) => {
+                    if (!shifts[date][idx]) {
+                        absences[idx]++;
+                    }
+                    
+                    const cell = document.querySelector(`[data-date="${date}"][data-employee="${idx}"]`);
+                    if (cell && shifts[date][idx]) {
+                        cell.classList.add('checked');
+                    }
+                });
+            });
+            
+            updateStats();
+            
+            if (sevenDayCount > maxExceptionDays) {
+                showAlert(`שיבוץ בוצע אך יש ${sevenDayCount} ימים עם 7 עובדים (מותר עד ${maxExceptionDays})`, 'warning');
+            } else {
+                showAlert('שיבוץ רנדומלי בוצע בהצלחה!', 'success');
+            }
+        }
+        
+        // Clear all shifts
+        function clearAll(confirm = true) {
+            if (confirm && !window.confirm('לנקות את כל הנתונים?')) return;
+            
+            Object.keys(shifts).forEach(date => {
+                Object.keys(shifts[date]).forEach(emp => {
+                    shifts[date][emp] = false;
+                });
+            });
+            
+            document.querySelectorAll('.shift-cell').forEach(cell => {
+                cell.classList.remove('checked', 'manual');
+            });
+            
+            updateStats();
+            if (confirm) showAlert('כל הנתונים נוקו!', 'info');
+        }
+        
+        // Validate schedule
+        function validateSchedule() {
+            let issues = [];
+            let sevenDayCount = 0;
+            
+            const sortedDates = Object.keys(shifts).sort((a, b) => {
+                const dateA = getDateParts(a);
+                const dateB = getDateParts(b);
+                return new Date(dateA.year, dateA.month - 1, dateA.day) - 
+                       new Date(dateB.year, dateB.month - 1, dateB.day);
+            });
+            
+            sortedDates.forEach(date => {
+                const dateParts = getDateParts(date);
+                const currentDate = new Date(dateParts.year, dateParts.month - 1, dateParts.day);
+                
+                if (!isHoliday(currentDate)) {
+                    const count = Object.values(shifts[date]).filter(Boolean).length;
+                    if (count === targetWorkers) {
+                        // Perfect!
+                    } else if (count === targetWorkers + 1) {
+                        sevenDayCount++;
+                        if (sevenDayCount <= maxExceptionDays) {
+                            issues.push(`${date}: 7 עובדים (חריגה מותרת ${sevenDayCount}/${maxExceptionDays})`);
+                        } else {
+                            issues.push(`${date}: 7 עובדים (חריגה מעל המותר!)`);
+                        }
+                    } else if (count < targetWorkers) {
+                        issues.push(`${date}: רק ${count} עובדים (צריך ${targetWorkers})`);
+                    } else {
+                        issues.push(`${date}: ${count} עובדים (יותר מדי!)`);
+                    }
+                }
+            });
+            
+            employees.forEach((emp, idx) => {
+                let maxConsecutive = 0;
+                let currentConsecutive = 0;
+                
+                sortedDates.forEach(date => {
+                    const dateParts = getDateParts(date);
+                    const currentDate = new Date(dateParts.year, dateParts.month - 1, dateParts.day);
+                    
+                    if (isHoliday(currentDate)) {
+                        return;
+                    }
+                    
+                    if (!shifts[date][idx]) {
+                        currentConsecutive++;
+                        maxConsecutive = Math.max(maxConsecutive, currentConsecutive);
+                    } else {
+                        currentConsecutive = 0;
+                    }
+                });
+                
+                if (maxConsecutive > maxAbsence) {
+                    issues.push(`${emp}: נעדר ${maxConsecutive} ימים רצופים (מותר עד ${maxAbsence})`);
+                }
+            });
+            
+            if (issues.length === 0) {
+                showAlert('✅ הלוח תקין! כל הדרישות מתקיימות.', 'success');
+            } else {
+                let alertType = sevenDayCount > maxExceptionDays ? 'danger' : 'warning';
+                showModal('📋 דוח תקינות:', issues.join('<br>'), alertType);
+            }
+        }
+        
+        // Search functions
+        function searchByName() {
+            const search = document.getElementById('searchName').value.toLowerCase();
+            clearHighlights();
+            
+            if (search) {
+                employees.forEach((emp, idx) => {
+                    if (emp.toLowerCase().includes(search)) {
+                        document.querySelectorAll(`[data-employee="${idx}"]`).forEach(cell => {
+                            cell.classList.add('highlight');
+                        });
+                    }
+                });
+            }
+        }
+        
+        function searchByDate() {
+            const searchDate = document.getElementById('searchDate').value;
+            clearHighlights();
+            
+            if (searchDate) {
+                const date = new Date(searchDate);
+                const dateKey = formatDate(date);
+                document.querySelectorAll(`[data-date="${dateKey}"]`).forEach(cell => {
+                    cell.classList.add('highlight');
+                });
+            }
+        }
+        
+        function clearSearch() {
+            document.getElementById('searchName').value = '';
+            document.getElementById('searchDate').value = '';
+            clearHighlights();
+        }
+        
+        function clearHighlights() {
+            document.querySelectorAll('.highlight').forEach(cell => {
+                cell.classList.remove('highlight');
+            });
+        }
+        
+        // Employee management
+        function updateEmployeeSelects() {
+            const selects = ['removeEmployeeSelect', 'editEmployeeSelect', 'employeeSelect'];
+            selects.forEach(selectId => {
+                const select = document.getElementById(selectId);
+                if (select) {
+                    select.innerHTML = '<option value="">בחר...</option>';
+                    employees.forEach((emp, idx) => {
+                        const option = document.createElement('option');
+                        option.value = idx;
+                        option.textContent = emp;
+                        select.appendChild(option);
+                    });
+                }
+            });
+        }
+        
+        function addEmployee() {
+            const name = document.getElementById('newEmployee').value.trim();
+            if (name && !employees.includes(name)) {
+                employees.push(name);
+                document.getElementById('newEmployee').value = '';
+                updateEmployeeSelects();
+                buildTable();
+                showAlert(`${name} נוסף בהצלחה!`, 'success');
+            }
+        }
+        
+        function removeEmployee() {
+            const idx = parseInt(document.getElementById('removeEmployeeSelect').value);
+            if (!isNaN(idx) && idx >= 0 && idx < employees.length) {
+                const name = employees[idx];
+                if (confirm(`למחוק את ${name}?`)) {
+                    employees.splice(idx, 1);
+                    updateEmployeeSelects();
+                    buildTable();
+                    showAlert(`${name} הוסר בהצלחה!`, 'success');
+                }
+            }
+        }
+        
+        function loadEmployeeName() {
+            const idx = parseInt(document.getElementById('editEmployeeSelect').value);
+            if (!isNaN(idx) && idx >= 0 && idx < employees.length) {
+                document.getElementById('editEmployeeName').value = employees[idx];
+            }
+        }
+        
+        function editEmployee() {
+            const idx = parseInt(document.getElementById('editEmployeeSelect').value);
+            const newName = document.getElementById('editEmployeeName').value.trim();
+            
+            if (!isNaN(idx) && idx >= 0 && idx < employees.length && newName) {
+                const oldName = employees[idx];
+                employees[idx] = newName;
+                updateEmployeeSelects();
+                buildTable();
+                showAlert(`${oldName} עודכן ל-${newName}!`, 'success');
+            }
+        }
+        
+        // Holiday management
+        function updateHolidaysList() {
+            const list = document.getElementById('holidaysList');
+            list.innerHTML = '';
+            
+            holidays.forEach((h, idx) => {
+                const li = document.createElement('li');
+                const start = new Date(h.start.getTime() + 24*60*60*1000);
+                const end = new Date(h.end.getTime() - 24*60*60*1000);
+                li.innerHTML = `${formatDate(start)}/${start.getFullYear()} - ${formatDate(end)}/${end.getFullYear()} 
+                    <button class="btn-danger" onclick="removeHoliday(${idx})">❌</button>`;
+                list.appendChild(li);
+            });
+        }
+        
+        function addHolidayPeriod() {
+            const startInput = document.getElementById('holidayStart').value;
+            const endInput = document.getElementById('holidayEnd').value;
+            
+            if (startInput && endInput) {
+                const start = new Date(startInput);
+                const end = new Date(endInput);
+                
+                if (start >= end) {
+                    showAlert('תאריך הסיום חייב להיות אחרי תאריך ההתחלה!', 'danger');
+                    return;
+                }
+                
+                const adjustedStart = new Date(start.getTime() - 24*60*60*1000);
+                const adjustedEnd = new Date(end.getTime() + 24*60*60*1000);
+                
+                holidays.push({ start: adjustedStart, end: adjustedEnd });
+                
+                Object.keys(shifts).forEach(date => {
+                    const dateParts = getDateParts(date);
+                    const currentDate = new Date(dateParts.year, dateParts.month - 1, dateParts.day);
+                    
+                    if (currentDate > adjustedStart && currentDate < adjustedEnd) {
+                        Object.keys(shifts[date]).forEach(emp => {
+                            shifts[date][emp] = false;
+                        });
+                    }
+                });
+                
+                updateHolidaysList();
+                buildTable();
+                showAlert(`תקופת חופש נוספה: ${formatDate(start)} - ${formatDate(end)}`, 'success');
+                
+                document.getElementById('holidayStart').value = '';
+                document.getElementById('holidayEnd').value = '';
+            }
+        }
+        
+        function removeHoliday(idx) {
+            if (confirm('למחוק תקופת חופש זו?')) {
+                holidays.splice(idx, 1);
+                updateHolidaysList();
+                buildTable();
+                showAlert('תקופת החופש הוסרה!', 'success');
+            }
+        }
+        
+        function clearHolidays() {
+            if (confirm('למחוק את כל תקופות החופש?')) {
+                holidays = [];
+                updateHolidaysList();
+                buildTable();
+                showAlert('כל תקופות החופש נמחקו!', 'success');
+            }
+        }
+        
+        // Settings functions
+        function updateDates() {
+            const start = document.getElementById('startDate').value;
+            const end = document.getElementById('endDate').value;
+            
+            if (start && end) {
+                startDate = new Date(start);
+                endDate = new Date(end);
+                buildTable();
+                showAlert('התאריכים עודכנו בהצלחה!', 'success');
+            }
+        }
+        
+        function updateParameters() {
+            maxAbsence = parseInt(document.getElementById('maxAbsence').value) || 6;
+            maxExceptionDays = parseInt(document.getElementById('maxExceptionDays').value) || 10;
+            updateStats();
+            showAlert('הפרמטרים עודכנו בהצלחה!', 'success');
+        }
+        
+        // Employee details view
+        function showEmployeeDetails() {
+            const idx = parseInt(document.getElementById('employeeSelect').value);
+            const detailsDiv = document.getElementById('employeeDetails');
+            
+            if (isNaN(idx) || idx < 0 || idx >= employees.length) {
+                detailsDiv.innerHTML = '';
+                return;
+            }
+            
+            const emp = employees[idx];
+            let html = `<div class="employee-card">
+                <h3>${emp}</h3>`;
+            
+            let workDays = 0;
+            let totalDays = 0;
+            let maxConsecutiveAbsence = 0;
+            let currentAbsence = 0;
+            let schedule = [];
+            
+            const sortedDates = Object.keys(shifts).sort((a, b) => {
+                const dateA = getDateParts(a);
+                const dateB = getDateParts(b);
+                return new Date(dateA.year, dateA.month - 1, dateA.day) - 
+                       new Date(dateB.year, dateB.month - 1, dateB.day);
+            });
+            
+            sortedDates.forEach(date => {
+                const dateParts = getDateParts(date);
+                const currentDate = new Date(dateParts.year, dateParts.month - 1, dateParts.day);
+                
+                if (!isHoliday(currentDate)) {
+                    totalDays++;
+                    if (shifts[date][idx]) {
+                        workDays++;
+                        currentAbsence = 0;
+                        schedule.push(`<span style="color: green;">✓ ${date}</span>`);
+                    } else {
+                        currentAbsence++;
+                        maxConsecutiveAbsence = Math.max(maxConsecutiveAbsence, currentAbsence);
+                        schedule.push(`<span style="color: red;">✗ ${date}</span>`);
+                    }
+                }
+            });
+            
+            html += `
+                <p><strong>ימי עבודה:</strong> ${workDays} מתוך ${totalDays}</p>
+                <p><strong>אחוז נוכחות:</strong> ${((workDays/totalDays)*100).toFixed(1)}%</p>
+                <p><strong>היעדרות מקסימלית רצופה:</strong> ${maxConsecutiveAbsence} ימים</p>
+                ${maxConsecutiveAbsence > maxAbsence ? '<p class="alert alert-danger">⚠️ חריגה ממגבלת ההיעדרות!</p>' : ''}
+                <h4>לוח זמנים מפורט:</h4>
+                <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px;">
+                    ${schedule.join('')}
+                </div>
+            </div>`;
+            
+            detailsDiv.innerHTML = html;
+        }
+        
+        // Export function
+        function exportCSV() {
+            let csv = '\ufeff';
+            csv += 'שם,';
+            
+            const dates = Object.keys(shifts).sort((a, b) => {
+                const dateA = getDateParts(a);
+                const dateB = getDateParts(b);
+                return new Date(dateA.year, dateA.month - 1, dateA.day) - 
+                       new Date(dateB.year, dateB.month - 1, dateB.day);
+            });
+            
+            csv += dates.join(',') + ',סה"כ\n';
+            
+            employees.forEach((emp, idx) => {
+                let row = [emp];
+                let total = 0;
+                
+                dates.forEach(date => {
+                    if (shifts[date][idx]) {
+                        row.push('✓');
+                        total++;
+                    } else {
+                        row.push('');
+                    }
+                });
+                
+                row.push(total);
+                csv += row.join(',') + '\n';
+            });
+            
+            let totalsRow = ['סה"כ יומי'];
+            dates.forEach(date => {
+                const dateParts = getDateParts(date);
+                const currentDate = new Date(dateParts.year, dateParts.month - 1, dateParts.day);
+                
+                if (isHoliday(currentDate)) {
+                    totalsRow.push('חופש');
+                } else {
+                    const count = Object.values(shifts[date]).filter(Boolean).length;
+                    totalsRow.push(count);
+                }
+            });
+            csv += totalsRow.join(',') + '\n';
+            
+            // Add summary rows
+            csv += '\n\nסיכום:\n';
+            csv += `סה"כ ימי עבודה,${workDays}\n`;
+            csv += `ימים עם 6 עובדים בדיוק,${workDays - sevenDayCount - (irregularDays - sevenDayCount)}\n`;
+            csv += `ימים עם 7 עובדים,${sevenDayCount}\n`;
+            csv += `ימים לא תקינים אחרים,${irregularDays - sevenDayCount}\n`;
+            csv += `ממוצע ימי עבודה לעובד,${(totalEmployeeWorkDays / employees.length).toFixed(1)}\n`;
+            
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `לוח_משמרות_${formatDate(new Date())}.csv`;
+            link.click();
+            
+            showAlert('הקובץ יוצא בהצלחה!', 'success');
+        }
+        
+        // Modal functions
+        function showModal(title, content, type = 'info') {
+            const modal = document.getElementById('alertModal');
+            const modalContent = document.getElementById('modalContent');
+            modalContent.innerHTML = `
+                <h2>${title}</h2>
+                <div class="alert alert-${type}">
+                    ${content}
+                </div>
+            `;
+            modal.style.display = 'block';
+        }
+        
+        function showAlert(message, type = 'info') {
+            const alertClass = type === 'success' ? 'alert-success' : 
+                             type === 'danger' ? 'alert-danger' : 
+                             type === 'warning' ? 'alert-warning' : 'alert-info';
+            
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert ${alertClass}`;
+            alertDiv.textContent = message;
+            alertDiv.style.position = 'fixed';
+            alertDiv.style.top = '20px';
+            alertDiv.style.left = '50%';
+            alertDiv.style.transform = 'translateX(-50%)';
+            alertDiv.style.zIndex = '9999';
+            alertDiv.style.minWidth = '300px';
+            alertDiv.style.textAlign = 'center';
+            
+            document.body.appendChild(alertDiv);
+            
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 3000);
+        }
+        
+        function closeModal() {
+            document.getElementById('alertModal').style.display = 'none';
+        }
+        
+        // Initialize on load
+        window.onload = init;
+        
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('alertModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>
