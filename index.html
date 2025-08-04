@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מערכת ניהול משמרות</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        
+        .controls {
+            background-color: #e3f2fd;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .control-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        label {
+            font-weight: bold;
+            color: #555;
+        }
+        
+        input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+        
+        button:hover {
+            opacity: 0.8;
+        }
+        
+        .btn-primary {
+            background-color: #2196F3;
+            color: white;
+        }
+        
+        .btn-success {
+            background-color: #4CAF50;
+            color: white;
+        }
+        
+        .btn-warning {
+            background-color: #ff9800;
+            color: white;
+        }
+        
+        .btn-danger {
+            background-color: #f44336;
+            color: white;
+        }
+        
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-box {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #e9ecef;
+        }
+        
+        .stat-box h4 {
+            color: #666;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        
+        .stat-box .value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .stat-box .value.error {
+            color: #f44336;
+        }
+        
+        .stat-box .value.warning {
+            color: #ff9800;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+        
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        
+        th {
+            background-color: #2196F3;
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .employee-name {
+            background-color: #e3f2fd;
+            font-weight: bold;
+            text-align: right;
+            position: sticky;
+            right: 0;
+            z-index: 5;
+            min-width: 150px;
+        }
+        
+        .date-header {
+            writing-mode: vertical-lr;
+            text-orientation: mixed;
+            height: 80px;
+            width: 40px;
+        }
+        
+        .shift-cell {
+            cursor: pointer;
+            user-select: none;
+            transition: background-color 0.2s;
+        }
+        
+        .shift-cell:hover {
+            background-color: #f0f0f0;
+        }
+        
+        .shift-cell.checked {
+            background-color: #4CAF50;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .shift-cell.manual {
+            background-color: #2e7d32;
+        }
+        
+        .shift-cell.holiday {
+            background-color: #fff59d;
+        }
+        
+        .shift-cell.checked.holiday {
+            background-color: #689f38;
+        }
+        
+        .total-cell {
+            background-color: #f5f5f5;
+            font-weight: bold;
+        }
+        
+        .total-cell.error {
+            background-color: #ffcdd2;
+            color: #d32f2f;
+        }
+        
+        .total-cell.warning {
+            background-color: #ffe082;
+            color: #f57f17;
+        }
+        
+        .daily-total {
+            background-color: #e8f5e9;
+            font-weight: bold;
+        }
+        
+        .search-section {
+            background-color: #fff3e0;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .highlight {
+            outline: 3px solid #ff9800;
+            outline-offset: -1px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>מערכת ניהול משמרות - 17 עובדים</h1>
+        
+        <div class="controls">
+            <h3>הגדרות:</h3>
+            <div class="control-row">
+                <label>תאריך התחלה:</label>
+                <input type="date" id="startDate" value="2024-07-28">
+                <label>תאריך סיום:</label>
+                <input type="date" id="endDate" value="2024-10-08">
+                <button class="btn-primary" onclick="updateDates()">עדכן תאריכים</button>
+            </div>
+            <div class="control-row">
+                <label>מינימום עובדים ביום:</label>
+                <input type="number" id="minWorkers" value="6" min="1" style="width: 60px;">
+                <label>מקסימום ימי היעדרות:</label>
+                <input type="number" id="maxAbsence" value="6" min="1" style="width: 60px;">
+            </div>
+            <div class="control-row">
+                <label>הוסף עובד:</label>
+                <input type="text" id="newEmployee" placeholder="שם העובד">
+                <button class="btn-success" onclick="addEmployee()">הוסף</button>
+            </div>
+        </div>
+        
+        <div class="search-section">
+            <h3>חיפוש:</h3>
+            <div class="control-row">
+                <input type="text" id="searchName" placeholder="חפש לפי שם..." onkeyup="searchByName()">
+                <input type="date" id="searchDate" onchange="searchByDate()">
+                <button class="btn-warning" onclick="clearSearch()">נקה חיפוש</button>
+            </div>
+        </div>
+        
+        <div class="stats-container">
+            <div class="stat-box">
+                <h4>סה"כ ימי עבודה</h4>
+                <div class="value" id="totalDays">0</div>
+            </div>
+            <div class="stat-box">
+                <h4>ימים עם מחסור</h4>
+                <div class="value error" id="lowDays">0</div>
+            </div>
+            <div class="stat-box">
+                <h4>ימים עם עודף</h4>
+                <div class="value warning" id="highDays">0</div>
+            </div>
+            <div class="stat-box">
+                <h4>היעדרויות ארוכות</h4>
+                <div class="value error" id="violations">0</div>
+            </div>
+        </div>
+        
+        <div class="action-buttons">
+            <button class="btn-success" onclick="smartFill()">🎯 השלם חכם</button>
+            <button class="btn-warning" onclick="randomFill()">🎲 שיבוץ רנדומלי מלא</button>
+            <button class="btn-danger" onclick="clearAll()">🗑️ נקה הכל</button>
+            <button class="btn-primary" onclick="exportCSV()">📊 ייצוא CSV</button>
+            <button class="btn-primary" onclick="showHelp()">❓ עזרה</button>
+        </div>
+        
+        <div class="table-container">
+            <table id="mainTable">
+                <thead id="tableHead"></thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Initial data
+        let employees = [
+            "דוד בר-און", "יצחק סיבוני", "מרו מנטאסנוט", "אביתר כהן",
+            "שי תמם", "רם שילון", "נדב תורג׳מן", "יגל טויטו",
+            "אהרון רטנר", "אהוד לובטון", "דגן", "שרון ברששת",
+            "אריאל ליבמן", "רואי אלבז", "שילה פארן", "מתן גרידיש", "יטיב דמרי"
+        ];
+        
+        let shifts = {};
+        let startDate = new Date('2024-07-28');
+        let endDate = new Date('2024-10-08');
+        let minWorkers = 6;
+        let maxAbsence = 6;
+        
+        const holidays = [
+            { start: new Date('2024-08-04'), end: new Date('2024-08-16') },
+            { start: new Date('2024-09-01'), end: new Date('2024-09-13') }
+        ];
+        
+        // Initialize
+        function init() {
+            buildTable();
+            updateStats();
+        }
+        
+        function isHoliday(date) {
+            return holidays.some(h => date >= h.start && date <= h.end);
+        }
+        
+        function formatDate(date) {
+            return `${date.getDate()}/${date.getMonth() + 1}`;
+        }
+        
+        function buildTable() {
+            shifts = {};
+            const thead = document.getElementById('tableHead');
+            const tbody = document.getElementById('tableBody');
+            thead.innerHTML = '';
+            tbody.innerHTML = '';
+            
+            // Header row
+            const headerRow = document.createElement('tr');
+            headerRow.innerHTML = '<th>שם העובד</th>';
+            
+            const dates = [];
+            let current = new Date(startDate);
+            while (current <= endDate) {
+                dates.push(new Date(current));
+                const th = document.createElement('th');
+                th.innerHTML = `<div class="date-header">${formatDate(current)}</div>`;
+                if (isHoliday(current)) {
+                    th.style.backgroundColor = '#fff59d';
+                }
+                headerRow.appendChild(th);
+                current.setDate(current.getDate() + 1);
+            }
+            headerRow.innerHTML += '<th>סה"כ</th>';
+            thead.appendChild(headerRow);
+            
+            // Employee rows
+            employees.forEach((emp, empIdx) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td class="employee-name">${emp}</td>`;
+                
+                dates.forEach(date => {
+                    const dateKey = formatDate(date);
+                    if (!shifts[dateKey]) shifts[dateKey] = {};
+                    shifts[dateKey][empIdx] = false;
+                    
+                    const cell = document.createElement('td');
+                    cell.className = 'shift-cell';
+                    if (isHoliday(date)) cell.classList.add('holiday');
+                    cell.dataset.date = dateKey;
+                    cell.dataset.employee = empIdx;
+                    cell.onclick = toggleShift;
+                    row.appendChild(cell);
+                });
+                
+                row.innerHTML += `<td class="total-cell" id="emp-total-${empIdx}">0</td>`;
+                tbody.appendChild(row);
+            });
+            
+            // Daily totals row
+            const totalRow = document.createElement('tr');
+            totalRow.innerHTML = '<td class="employee-name">סה"כ יומי</td>';
+            dates.forEach(date => {
+                const dateKey = formatDate(date);
+                totalRow.innerHTML += `<td class="daily-total" id="day-total-${dateKey}">0</td>`;
+            });
+            totalRow.innerHTML += '<td></td>';
+            tbody.appendChild(totalRow);
+            
+            document.getElementById('totalDays').textContent = dates.length;
+        }
+        
+        function toggleShift(e) {
+            const date = e.target.dataset.date;
+            const emp = e.target.dataset.employee;
+            shifts[date][emp] = !shifts[date][emp];
+            
+            if (shifts[date][emp]) {
+                e.target.classList.add('checked', 'manual');
+                e.target.textContent = '✓';
+            } else {
+                e.target.classList.remove('checked', 'manual');
+                e.target.textContent = '';
+            }
+            
+            updateStats();
+        }
+        
+        function updateStats() {
+            let lowDays = 0;
+            let highDays = 0;
+            let violations = 0;
+            
+            // Update daily totals
+            Object.keys(shifts).forEach(date => {
+                const count = Object.values(shifts[date]).filter(Boolean).length;
+                const cell = document.getElementById(`day-total-${date}`);
+                if (cell) {
+                    cell.textContent = count;
+                    cell.classList.remove('error', 'warning');
+                    if (count < minWorkers) {
+                        cell.classList.add('error');
+                        lowDays++;
+                    } else if (count > minWorkers) {
+                        cell.classList.add('warning');
+                        highDays++;
+                    }
+                }
+            });
+            
+            // Update employee totals and check violations
+            employees.forEach((emp, idx) => {
+                let total = 0;
+                let maxConsecutive = 0;
+                let currentConsecutive = 0;
+                
+                Object.keys(shifts).sort().forEach(date => {
+                    if (shifts[date][idx]) {
+                        total++;
+                        currentConsecutive = 0;
+                    } else {
+                        currentConsecutive++;
+                        maxConsecutive = Math.max(maxConsecutive, currentConsecutive);
+                    }
+                });
+                
+                const cell = document.getElementById(`emp-total-${idx}`);
+                if (cell) {
+                    cell.textContent = total;
+                    cell.classList.remove('error');
+                    if (maxConsecutive > maxAbsence) {
+                        cell.classList.add('error');
+                        violations++;
+                    }
+                }
+            });
+            
+            document.getElementById('lowDays').textContent = lowDays;
+            document.getElementById('highDays').textContent = highDays;
+            document.getElementById('violations').textContent = violations;
+        }
+        
+        function clearAll() {
+            if (!confirm('לנקות את כל הנתונים?')) return;
+            
+            Object.keys(shifts).forEach(date => {
+                Object.keys(shifts[date]).forEach(emp => {
+                    shifts[date][emp] = false;
+                });
+            });
+            
+            document.querySelectorAll('.shift-cell').forEach(cell => {
+                cell.classList.remove('checked', 'manual');
+                cell.textContent = '';
+            });
+            
+            updateStats();
+        }
+        
+        function smartFill() {
+            const dates = Object.keys(shifts).sort();
+            const absences = new Array(employees.length).fill(0);
+            
+            dates.forEach(date => {
+                const current = Object.values(shifts[date]).filter(Boolean).length;
+                const needed = Math.max(0, minWorkers - current);
+                
+                if (needed > 0) {
+                    const available = [];
+                    employees.forEach((emp, idx) => {
+                        if (!shifts[date][idx] && absences[idx] < maxAbsence) {
+                            available.push(idx);
+                        }
+                    });
+                    
+                    // Sort by absence count (prioritize those with more absences)
+                    available.sort((a, b) => absences[b] - absences[a]);
+                    
+                    // Assign needed workers
+                    for (let i = 0; i < Math.min(needed, available.length); i++) {
+                        const empIdx = available[i];
+                        shifts[date][empIdx] = true;
+                        
+                        const cell = document.querySelector(`[data-date="${date}"][data-employee="${empIdx}"]`);
+                        if (cell) {
+                            cell.classList.add('checked');
+                            cell.classList.remove('manual');
+                            cell.textContent = '✓';
+                        }
+                    }
+                }
+                
+                // Update absence counters
+                employees.forEach((emp, idx) => {
+                    if (shifts[date][idx]) {
+                        absences[idx] = 0;
+                    } else {
+                        absences[idx]++;
+                    }
+                });
+            });
+            
+            updateStats();
+        }
+        
+        function randomFill() {
+            if (!confirm('זה ימחק את כל השיבוצים הקיימים. להמשיך?')) return;
+            
+            clearAll();
+            
+            const dates = Object.keys(shifts).sort();
+            const absences = new Array(employees.length).fill(0);
+            const workDays = new Array(employees.length).fill(0);
+            
+            dates.forEach(date => {
+                const target = minWorkers + Math.floor(Math.random() * 3);
+                const must = [];
+                const available = [];
+                
+                employees.forEach((emp, idx) => {
+                    if (absences[idx] >= maxAbsence) {
+                        must.push(idx);
+                    } else {
+                        available.push(idx);
+                    }
+                });
+                
+                // Assign must work
+                must.forEach(idx => {
+                    shifts[date][idx] = true;
+                    absences[idx] = 0;
+                    workDays[idx]++;
+                });
+                
+                // Randomly assign others
+                const remaining = target - must.length;
+                available.sort(() => Math.random() - 0.5);
+                
+                for (let i = 0; i < Math.min(remaining, available.length); i++) {
+                    const idx = available[i];
+                    shifts[date][idx] = true;
+                    absences[idx] = 0;
+                    workDays[idx]++;
+                }
+                
+                // Update absence counters for non-working
+                employees.forEach((emp, idx) => {
+                    if (!shifts[date][idx]) {
+                        absences[idx]++;
+                    }
+                    
+                    const cell = document.querySelector(`[data-date="${date}"][data-employee="${idx}"]`);
+                    if (cell && shifts[date][idx]) {
+                        cell.classList.add('checked');
+                        cell.textContent = '✓';
+                    }
+                });
+            });
+            
+            updateStats();
+        }
+        
+        function searchByName() {
+            const search = document.getElementById('searchName').value.toLowerCase();
+            clearHighlights();
+            
+            if (search) {
+                employees.forEach((emp, idx) => {
+                    if (emp.toLowerCase().includes(search)) {
+                        document.querySelectorAll(`[data-employee="${idx}"]`).forEach(cell => {
+                            cell.classList.add('highlight');
+                        });
+                    }
+                });
+            }
+        }
+        
+        function searchByDate() {
+            const searchDate = document.getElementById('searchDate').value;
+            clearHighlights();
+            
+            if (searchDate) {
+                const date = new Date(searchDate);
+                const dateKey = formatDate(date);
+                document.querySelectorAll(`[data-date="${dateKey}"]`).forEach(cell => {
+                    cell.classList.add('highlight');
+                });
+            }
+        }
+        
+        function clearSearch() {
+            document.getElementById('searchName').value = '';
+            document.getElementById('searchDate').value = '';
+            clearHighlights();
+        }
+        
+        function clearHighlights() {
+            document.querySelectorAll('.highlight').forEach(cell => {
+                cell.classList.remove('highlight');
+            });
+        }
+        
+        function updateDates() {
+            const start = document.getElementById('startDate').value;
+            const end = document.getElementById('endDate').value;
+            
+            if (start && end) {
+                startDate = new Date(start);
+                endDate = new Date(end);
+                buildTable();
+                updateStats();
+            }
+        }
+        
+        function addEmployee() {
+            const name = document.getElementById('newEmployee').value.trim();
+            if (name && !employees.includes(name)) {
+                employees.push(name);
+                document.getElementById('newEmployee').value = '';
+                buildTable();
+                updateStats();
+                alert(`${name} נוסף בהצלחה!`);
+            }
+        }
+        
+        function exportCSV() {
+            let csv = '\ufeff';
+            csv += 'שם,';
+            
+            const dates = Object.keys(shifts).sort();
+            csv += dates.join(',') + ',סה"כ\n';
+            
+            employees.forEach((emp, idx) => {
+                let row = [emp];
+                let total = 0;
+                
+                dates.forEach(date => {
+                    if (shifts[date][idx]) {
+                        row.push('✓');
+                        total++;
+                    } else {
+                        row.push('');
+                    }
+                });
+                
+                row.push(total);
+                csv += row.join(',') + '\n';
+            });
+            
+            // Add daily totals
+            let totalsRow = ['סה"כ יומי'];
+            dates.forEach(date => {
+                const count = Object.values(shifts[date]).filter(Boolean).length;
+                totalsRow.push(count);
+            });
+            csv += totalsRow.join(',') + '\n';
+            
+            // Download
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'לוח_משמרות.csv';
+            link.click();
+        }
+        
+        function showHelp() {
+            alert(`הוראות שימוש:
+            
+1. לחיצה על תא משבצת/מבטלת עובד
+2. השלם חכם - משלים רק את החסר
+3. שיבוץ רנדומלי - מתחיל מחדש
+4. חיפוש לפי שם או תאריך
+5. ייצוא ל-CSV לפתיחה באקסל
+
+דרישות:
+- מינימום 6 עובדים ביום
+- מקסימום 6 ימי היעדרות רצופים
+- ימי חופש מסומנים בצהוב`);
+        }
+        
+        // Start
+        window.onload = init;
+    </script>
+</body>
+</html>
